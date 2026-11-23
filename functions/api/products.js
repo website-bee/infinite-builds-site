@@ -4,7 +4,14 @@ import { listProducts, jsonResponse, sized, money } from '../_lib.js';
 
 export async function onRequestGet({ env, request }) {
   const category = new URL(request.url).searchParams.get('category') || null;
-  const rows = await listProducts(env.DB, { category });
+  let rows;
+  try {
+    rows = await listProducts(env.DB, { category });
+  } catch (err) {
+    console.error('api/products', err);
+    // Thường gặp khi chưa nạp db/schema.sql + db/seed.sql vào D1 (xem README.md)
+    return jsonResponse({ error: 'Database chưa sẵn sàng' }, 503);
+  }
   const products = rows.map((p) => {
     const prices = p.variants.map((v) => v.price);
     return {

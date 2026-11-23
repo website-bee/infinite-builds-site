@@ -14,5 +14,10 @@ export async function onRequest({ request, env, data, next }) {
     if (origin && origin !== new URL(request.url).origin) return jsonResponse({ error: 'Origin không hợp lệ' }, 403);
   }
   data.user = user;
-  return next();
+  try {
+    return await next();
+  } catch (err) {
+    console.error('api/admin', err);
+    return jsonResponse({ error: 'Lỗi máy chủ (database đã nạp schema.sql và seed.sql chưa?)' }, 500);
+  }
 }
