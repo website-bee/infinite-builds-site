@@ -1,9 +1,9 @@
 // Chạy trước MỌI request tới /api/admin/*.
-// Lớp bảo vệ thứ 2 sau Cloudflare Access: tự kiểm tra chữ ký JWT của Access, không tin mạng ngoài.
-import { verifyAccess, jsonResponse } from '../../_lib.js';
+// Tự kiểm tra đăng nhập ở chính API (cookie phiên từ /admin/login, hoặc JWT của Cloudflare Access) — không tin gì từ bên ngoài.
+import { verifyAdmin, jsonResponse } from '../../_lib.js';
 
 export async function onRequest({ request, env, data, next }) {
-  const user = await verifyAccess(request, env);
+  const user = await verifyAdmin(request, env);
   if (!user) return jsonResponse({ error: 'Không có quyền truy cập' }, 401);
 
   // Chống CSRF: request ghi dữ liệu phải có header riêng (trình duyệt không tự gắn từ trang khác)

@@ -65,3 +65,9 @@ CREATE TABLE IF NOT EXISTS images (
   data        TEXT NOT NULL,               -- base64
   created_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Đếm lần đăng nhập sai theo IP (chống dò mật khẩu). Tự dọn sau 15 phút; bảng cũng tự tạo khi cần.
+CREATE TABLE IF NOT EXISTS login_attempts (
+  ip  TEXT NOT NULL,
+  at  INTEGER NOT NULL            -- thời điểm (ms)
+);

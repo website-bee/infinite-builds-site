@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Đăng nhập — Infinite Builds Studio</title>
+  <link rel="icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/admin/admin.css">
+  <style>
+    body { display: grid; place-items: center; min-height: 100vh; }
+    .box { width: min(380px, 92vw); }
+    .box h1 { font-size: 20px; margin-bottom: 4px; }
+    .err { color: var(--danger); min-height: 1.4em; margin: 8px 0 0; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <form class="card box" id="f">
+    <h1>Infinite Builds <span style="color:var(--accent)">Admin</span></h1>
+    <p class="muted small">Đăng nhập để quản lý sản phẩm.</p>
+    <label class="field"><span>Mật khẩu</span>
+      <input type="password" id="pw" autocomplete="current-password" autofocus required>
+    </label>
+    <button class="btn primary" id="go" style="width:100%;justify-content:center">Đăng nhập</button>
+    <p class="err" id="err" role="alert"></p>
+  </form>
+  <script>
+    const f = document.getElementById('f'), err = document.getElementById('err'), go = document.getElementById('go');
+    fetch('/api/auth').then(r => r.json()).then(s => {
+      if (s.loggedIn) location.replace('/admin/');
+      else if (!s.configured) err.textContent = 'Chưa cài mật khẩu admin trên Cloudflare (biến ADMIN_PASSWORD). Xem README.md.';
+    }).catch(() => {});
+    f.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.textContent = ''; go.disabled = true;
+      try {
+        const r = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Admin-Request': '1' },
+          body: JSON.stringify({ password: document.getElementById('pw').value }) });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok) return location.replace('/admin/');
+        err.textContent = d.error || 'Đăng nhập lỗi (' + r.status + ')';
+      } catch (x) { err.textContent = 'Không kết nối được. Kiểm tra mạng rồi thử lại.'; }
+      go.disabled = false;
+    });
+  </script>
+</body>
+</html>

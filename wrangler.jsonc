@@ -14,11 +14,8 @@
     }
   ]
 
-  // Bảo vệ Admin: sau khi tạo ứng dụng Cloudflare Access, bỏ dấu // ở khối dưới và điền 2 giá trị.
-  // (Hai giá trị này không phải mật khẩu.) Chưa điền = mọi API admin đều từ chối, an toàn mặc định.
-  // KHÔNG ghi email của bạn vào file này nếu repo để Public. Email được giới hạn trong policy của Access.
-  // , "vars": {
-  //   "ACCESS_TEAM_DOMAIN": "tenban.cloudflareaccess.com",
-  //   "ACCESS_AUD": "chuoi-audience-tag-dai"
-  // }
+  // Bảo vệ Admin: đặt mật khẩu trên Cloudflare (KHÔNG ghi vào file này vì repo có thể Public):
+  //   Pages > Settings > Variables and secrets > Add > loại Secret, tên ADMIN_PASSWORD, tối thiểu 10 ký tự.
+  // Chưa đặt = trang Admin và mọi API admin đều từ chối.
+  // (Nếu sau này dùng Cloudflare Access: thêm "vars": { "ACCESS_TEAM_DOMAIN": "...", "ACCESS_AUD": "..." })
 }

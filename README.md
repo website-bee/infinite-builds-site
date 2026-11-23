@@ -12,7 +12,8 @@ functions/     Backend (chạy trên Cloudflare, cùng domain với website)
   _lib.js        Mọi hàm dùng chung: template, truy vấn D1, kiểm tra quyền (đọc mục lục ở đầu file)
   products/ collections/ blog/   Dựng trang từ database
   api/products.js                Danh sách sản phẩm công khai (cho ô tìm kiếm)
-  api/admin/                     API cho trang quản trị — luôn kiểm tra đăng nhập
+  api/auth.js, api/admin/        Đăng nhập; API trang quản trị — luôn tự kiểm tra đăng nhập
+  admin/_middleware.js           Chặn /admin/ khi chưa đăng nhập
   img/[id].js                    Phục vụ ảnh upload
 db/            schema.sql (cấu trúc bảng) và seed.sql (dữ liệu chuyển từ HTML cũ, tự sinh)
 scripts/       migrate.py (HTML cũ -> seed.sql) và các bài kiểm thử
@@ -31,10 +32,11 @@ Cần Node.js. Mọi lệnh chạy ở thư mục gốc của project.
    ```
    Chạy lại seed bất cứ lúc nào cũng an toàn: không ghi đè những gì bạn đã sửa trong Admin.
 3. **Cloudflare Pages → project → Settings → Builds:** Build command để trống, **Build output directory = `public`**.
-4. **Bảo vệ Admin (Cloudflare Zero Trust → Access → Applications → Self-hosted):**
-   hai đường dẫn `/admin*` và `/api/admin*`, policy Allow đúng email của bạn.
-   Rồi mở `wrangler.jsonc`, bỏ dấu `//` ở khối `vars` và điền `ACCESS_TEAM_DOMAIN` và `ACCESS_AUD`. (Đừng ghi email vào file này nếu repo Public — email nằm trong policy của Access.)
-   Chưa điền thì mọi API admin đều từ chối — an toàn mặc định.
+4. **Đặt mật khẩu Admin (Cloudflare Pages → project → Settings → Variables and secrets → Add):**
+   loại **Secret**, tên `ADMIN_PASSWORD`, giá trị là mật khẩu dài (tối thiểu 10 ký tự, nên là một câu dài dễ nhớ).
+   Sau đó bấm Retry/Redeploy (hoặc push code) để mật khẩu có hiệu lực. Đổi mật khẩu = mọi phiên đăng nhập cũ bị đăng xuất.
+   Đăng nhập tại `/admin/login`. Sai quá 8 lần/15 phút từ một IP thì IP đó bị khóa tạm.
+   *(Có Cloudflare Access thì dùng được thay thế: điền `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` vào `vars` trong `wrangler.jsonc`.)*
 5. Push lên GitHub như bình thường. Vào `https://tên-miền/admin/`.
 
 Trong lúc chưa làm bước 2, website vẫn chạy bằng các file HTML cũ nằm trong `public/products|collections|blog`.
@@ -47,7 +49,7 @@ npx wrangler d1 execute infinite-builds-db --local --file=db/schema.sql
 npx wrangler d1 execute infinite-builds-db --local --file=db/seed.sql
 npx wrangler pages dev            # mở http://localhost:8788  và  http://localhost:8788/admin/
 ```
-File `.dev.vars` (`DEV_AUTH_BYPASS=1`) cho phép vào Admin không cần đăng nhập, **chỉ khi truy cập bằng `localhost`**. Không bao giờ đưa file này lên Cloudflare.
+File `.dev.vars` (`DEV_AUTH_BYPASS=1`) cho phép vào Admin không cần đăng nhập, **chỉ khi truy cập bằng `localhost`**. Muốn thử màn hình đăng nhập: thêm dòng `ADMIN_PASSWORD=mat-khau-thu-nghiem` và mở bằng `http://127.0.0.1:8788/admin/`. Không bao giờ đưa file này lên Cloudflare.
 
 ## Kiểm thử
 

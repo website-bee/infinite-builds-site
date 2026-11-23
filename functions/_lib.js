@@ -708,14 +708,69 @@ export function adminRow(p) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// 6. XÁC THỰC CLOUDFLARE ACCESS
+// 6. XÁC THỰC ADMIN
 // ═════════════════════════════════════════════════════════════════════════════
-// Cần 2 biến môi trường (Pages > Settings > Variables):
-//   ACCESS_TEAM_DOMAIN  vd  tenban.cloudflareaccess.com
-//   ACCESS_AUD          "Application Audience (AUD) Tag" của ứng dụng Access
-// Tùy chọn:
-//   ADMIN_EMAILS        danh sách email được phép, ngăn cách bằng dấu phẩy (thêm một lớp kiểm tra)
-// Chạy local: tạo file .dev.vars với DEV_AUTH_BYPASS=1 (chỉ có tác dụng khi host là localhost).
+// Có 2 cách đăng nhập, cách nào được cấu hình thì cách đó hoạt động (có thể bật cả hai):
+//
+//  A) MẬT KHẨU (không cần Cloudflare Zero Trust, không cần thẻ)
+//     Cloudflare Pages > Settings > Variables and secrets > Add:  ADMIN_PASSWORD  (loại Secret, tối thiểu 10 ký tự)
+//     Đăng nhập ở /admin/login -> server cấp cookie phiên ký bằng HMAC, hiệu lực 7 ngày.
+//     Đổi ADMIN_PASSWORD = mọi phiên cũ bị vô hiệu.
+//
+//  B) CLOUDFLARE ACCESS (nếu sau này có)
+//     ACCESS_TEAM_DOMAIN (vd tenban.cloudflareaccess.com) và ACCESS_AUD (Audience Tag của ứng dụng Access).
+//     Tùy chọn ADMIN_EMAILS: danh sách email được phép, ngăn cách bằng dấu phẩy.
+//
+// Chạy local: file .dev.vars có DEV_AUTH_BYPASS=1 (chỉ có tác dụng khi host là "localhost").
+// Chưa cấu hình cách nào = mọi API admin đều từ chối.
+
+const enc = new TextEncoder();
+const toHex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+export const SESSION_COOKIE = 'admin_session';
+const SESSION_DAYS = 7;
+
+export const adminPasswordReady = (env) => typeof env.ADMIN_PASSWORD === 'string' && env.ADMIN_PASSWORD.length >= 10;
+
+async function sessionKey(env) {
+  const base = await crypto.subtle.digest('SHA-256', enc.encode('ib-admin-session|' + env.ADMIN_PASSWORD));
+  return crypto.subtle.importKey('raw', base, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+}
+const sign = async (env, msg) => toHex(await crypto.subtle.sign('HMAC', await sessionKey(env), enc.encode(msg)));
+
+/** So sánh không lộ thời gian: so hai bản băm cùng độ dài. */
+async function safeEqual(a, b) {
+  const [x, y] = await Promise.all([a, b].map(async (t) => new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(t)))));
+  let diff = 0;
+  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
+  return diff === 0;
+}
+export async function passwordMatches(env, given) {
+  return adminPasswordReady(env) && safeEqual(String(given ?? ''), env.ADMIN_PASSWORD);
+}
+
+/** Tạo giá trị cookie phiên mới. */
+export async function createSession(env) {
+  const msg = `v1.${Date.now() + SESSION_DAYS * 864e5}`;
+  return { value: `${msg}.${await sign(env, msg)}`, maxAge: SESSION_DAYS * 86400 };
+}
+async function sessionValid(env, token) {
+  if (!adminPasswordReady(env) || !token) return false;
+  const m = /^(v1\.(\d{10,15}))\.([0-9a-f]{64})$/.exec(token);
+  if (!m || Number(m[2]) < Date.now()) return false;
+  return safeEqual(m[3], await sign(env, m[1]));
+}
+export function readCookie(request, name) {
+  const m = (request.headers.get('Cookie') || '').split(/;\s*/).find((c) => c.startsWith(name + '='));
+  return m ? decodeURIComponent(m.slice(name.length + 1)) : null;
+}
+
+/** Trả về { email } nếu request đến từ admin hợp lệ, ngược lại null. */
+export async function verifyAdmin(request, env) {
+  if (await sessionValid(env, readCookie(request, SESSION_COOKIE))) return { email: 'admin' };
+  return verifyAccess(request, env);
+}
+
+// ── Cloudflare Access (cách B)
 const b64urlToBytes = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
 const b64urlToJSON = (s) => JSON.parse(new TextDecoder().decode(b64urlToBytes(s)));
 

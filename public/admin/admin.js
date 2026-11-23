@@ -53,9 +53,8 @@
     });
     let data = null;
     try { data = await res.json(); } catch (e) { /* không phải JSON */ }
-    if (!res.ok) {
-      throw new Error((data && data.error) || (res.status === 401 ? 'Phiên đăng nhập đã hết hạn — hãy tải lại trang.' : 'Lỗi ' + res.status));
-    }
+    if (res.status === 401) { location.href = '/admin/login'; throw new Error('Cần đăng nhập lại…'); }
+    if (!res.ok) throw new Error((data && data.error) || 'Lỗi ' + res.status);
     return data;
   }
 

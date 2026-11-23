@@ -16,9 +16,17 @@
       <a href="#/categories" data-nav="categories">Danh mục</a>
       <a href="/" target="_blank" rel="noopener">Xem website ↗</a>
     </nav>
+    <a href="#" id="logout" class="right" style="color:var(--muted);text-decoration:none;font-size:14px">Đăng xuất</a>
   </header>
   <main id="app"><p class="muted pad">Đang tải…</p></main>
   <div id="toasts" aria-live="polite"></div>
+  <script>
+    document.getElementById('logout').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await fetch('/api/auth', { method: 'DELETE', headers: { 'X-Admin-Request': '1' } });
+      location.href = '/admin/login';
+    });
+  </script>
   <script src="/admin/admin.js"></script>
 </body>
 </html>

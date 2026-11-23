@@ -9,6 +9,8 @@ import * as adminUpload from '../functions/api/admin/upload.js';
 import * as adminCategories from '../functions/api/admin/categories.js';
 import * as publicProducts from '../functions/api/products.js';
 import * as img from '../functions/img/[id].js';
+import * as auth from '../functions/api/auth.js';
+import * as adminGate from '../functions/admin/_middleware.js';
 
 let pass = 0;
 const test = async (name, fn) => {
@@ -214,5 +216,81 @@ await test('thêm danh mục -> hiện ở menu & trang /collections; xóa -> s�
   assert.equal(row.category, null);
   assert.equal(await collectionPage(env, new Request(URL0 + '/'), 'test-cat'), null);
 });
+
+console.log('Đăng nhập bằng mật khẩu');
+{
+  const PW = 'correct horse battery staple';
+  const e2 = { DB: env.DB, ASSETS: env.ASSETS, ADMIN_PASSWORD: PW }; // KHÔNG có DEV_AUTH_BYPASS
+  const H = { 'X-Admin-Request': '1', 'Content-Type': 'application/json', 'CF-Connecting-IP': '203.0.113.9' };
+  const login = (password, env2 = e2, ip = '203.0.113.9') =>
+    auth.onRequestPost({ env: env2, request: new Request('https://shop.example.com/api/auth', { method: 'POST', headers: { ...H, 'CF-Connecting-IP': ip }, body: JSON.stringify({ password }) }) });
+  const gate = (cookie, env2 = e2) =>
+    middleware.onRequest({ env: env2, data: {}, next: async () => new Response('OK'),
+      request: new Request('https://shop.example.com/api/admin/products', { headers: cookie ? { Cookie: cookie } : {} }) });
+  const cookieOf = (res) => res.headers.get('Set-Cookie').split(';')[0];
+  let good;
+
+  await test('sai mật khẩu -> 401, không có cookie', async () => {
+    const r = await login('sai-mat-khau-roi');
+    assert.equal(r.status, 401);
+    assert.equal(r.headers.get('Set-Cookie'), null);
+  });
+  await test('đúng mật khẩu -> 200 + cookie HttpOnly/Secure/SameSite=Strict', async () => {
+    const r = await login(PW, e2, '203.0.113.50');
+    assert.equal(r.status, 200);
+    const c = r.headers.get('Set-Cookie');
+    assert.match(c, /HttpOnly/); assert.match(c, /Secure/); assert.match(c, /SameSite=Strict/); assert.match(c, /Max-Age=604800/);
+    good = cookieOf(r);
+  });
+  await test('API admin: không cookie -> 401; cookie đúng -> vào được', async () => {
+    assert.equal((await gate(null)).status, 401);
+    assert.equal((await gate(good)).status, 200);
+  });
+  await test('cookie bị sửa / hết hạn / ký bằng mật khẩu khác -> 401', async () => {
+    const [name, val] = good.split('=');
+    const [v, exp, sig] = val.split('.');
+    assert.equal((await gate(`${name}=${v}.${Number(exp) + 1000}.${sig}`)).status, 401, 'sửa hạn dùng');
+    assert.equal((await gate(`${name}=${v}.${exp}.${'0'.repeat(64)}`)).status, 401, 'chữ ký giả');
+    assert.equal((await gate(`${name}=${v}.${Date.now() - 1000}.${sig}`)).status, 401, 'hết hạn');
+    assert.equal((await gate(good, { ...e2, ADMIN_PASSWORD: 'mat-khau-moi-hoan-toan' })).status, 401, 'đổi mật khẩu = mọi phiên cũ mất hiệu lực');
+    assert.equal((await gate('admin_session=garbage')).status, 401);
+  });
+  await test('mật khẩu quá ngắn (<10) hoặc chưa đặt -> không bao giờ đăng nhập được', async () => {
+    assert.equal((await login('short', { ...e2, ADMIN_PASSWORD: 'short' })).status, 503);
+    assert.equal((await login('', { ...e2, ADMIN_PASSWORD: undefined })).status, 503);
+    assert.equal((await gate('admin_session=v1.9999999999999.' + 'a'.repeat(64), { ...e2, ADMIN_PASSWORD: undefined })).status, 401);
+  });
+  await test('POST đăng nhập thiếu X-Admin-Request / sai Origin -> 403', async () => {
+    const r1 = await auth.onRequestPost({ env: e2, request: new Request('https://shop.example.com/api/auth', { method: 'POST', body: '{}' }) });
+    assert.equal(r1.status, 403);
+    const r2 = await auth.onRequestPost({ env: e2, request: new Request('https://shop.example.com/api/auth', { method: 'POST', headers: { ...H, Origin: 'https://evil.example' }, body: '{}' }) });
+    assert.equal(r2.status, 403);
+  });
+  await test('sai 8 lần -> khóa IP (kể cả nhập đúng), IP khác vẫn đăng nhập được', async () => {
+    const attacker = '198.51.100.7';
+    for (let i = 0; i < 8; i++) assert.equal((await login('doan-sai-' + i, e2, attacker)).status, 401);
+    assert.equal((await login(PW, e2, attacker)).status, 429);
+    assert.equal((await login(PW, e2, '203.0.113.77')).status, 200);
+  });
+  await test('chốt chặn /admin/: chưa đăng nhập -> chuyển về /admin/login; trang login mở công khai', async () => {
+    const run = (path, cookie) => adminGate.onRequest({ env: e2, next: async () => new Response('OK'),
+      request: new Request('https://shop.example.com' + path, { headers: cookie ? { Cookie: cookie } : {} }) });
+    for (const p of ['/admin/', '/admin', '/admin/admin.js', '/admin/index.html']) {
+      const r = await run(p);
+      assert.equal(r.status, 302, p);
+      assert.equal(new URL(r.headers.get('Location')).pathname, '/admin/login');
+    }
+    for (const p of ['/admin/login', '/admin/login.html', '/admin/admin.css']) assert.equal((await run(p)).status, 200, p);
+    assert.equal((await run('/admin/', good)).status, 200);
+  });
+  await test('đăng xuất xóa cookie; GET /api/auth báo trạng thái', async () => {
+    const out = await auth.onRequestDelete({ request: new Request('https://shop.example.com/api/auth', { method: 'DELETE', headers: H }) });
+    assert.match(out.headers.get('Set-Cookie'), /Max-Age=0/);
+    const st = await (await auth.onRequestGet({ env: e2, request: new Request('https://shop.example.com/api/auth', { headers: { Cookie: good } }) })).json();
+    assert.deepEqual(st, { configured: true, loggedIn: true });
+    const st2 = await (await auth.onRequestGet({ env: e2, request: new Request('https://shop.example.com/api/auth') })).json();
+    assert.deepEqual(st2, { configured: true, loggedIn: false });
+  });
+}
 
 console.log(`\n${pass} kiểm thử đạt${process.exitCode ? ', CÓ LỖI' : ''}`);
