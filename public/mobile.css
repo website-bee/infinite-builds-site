@@ -1,0 +1,71 @@
+/* Tối ưu giao diện điện thoại (≤640px).
+   File này được nạp SAU style gốc của từng trang nên ghi đè được.
+   Nếu sau này build lại từ mã nguồn Astro, nhớ chép các rule này vào source. */
+@media (max-width: 640px) {
+  /* Header: xem header.css */
+
+  .wrap { padding-left: 14px !important; padding-right: 14px !important; }
+
+  /* --- Lưới sản phẩm: 2 cột thay vì 1 cột to đùng --- */
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .card-body { padding: 8px 10px 10px !important; }
+  .card-body h3 {
+    font-size: .85rem !important;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card .price { font-size: .85rem !important; gap: 4px !important; }
+  .card .price s, .card .compare { font-size: .75rem; }
+  .card-img .sale-badge, .card-img [class*="badge"] {
+    font-size: .65rem !important; padding: 2px 7px !important; top: 6px !important; left: 6px !important;
+  }
+
+  /* --- Ô "Shop by collection" ở trang chủ: lưới 2x2 --- */
+  .coll-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .coll { aspect-ratio: 1 / 1 !important; }
+  .coll span {
+    left: 6px !important; right: 6px; bottom: 6px !important;
+    padding: 4px 9px !important; font-size: .75rem !important; line-height: 1.25;
+    text-align: center;
+  }
+
+  /* --- Hero trang chủ: ảnh thấp lại để thấy sản phẩm sớm hơn --- */
+  .hero { padding: 24px 0 !important; }
+  .hero-inner { gap: 20px !important; }
+  .hero-visual img { aspect-ratio: 4 / 3 !important; }
+  .hero-actions .btn { flex: 1 1 auto; text-align: center; }
+
+  /* --- Trang sản phẩm --- */
+  .product-page {
+    grid-template-columns: minmax(0, 1fr) !important; /* không cho nội dung đẩy rộng quá màn hình */
+    gap: 20px !important; padding: 16px 14px 40px !important;
+  }
+  .product-page > * { min-width: 0; }
+  .info h1 { font-size: 1.35rem !important; }
+  /* Ảnh nhỏ: 1 hàng vuốt ngang thay vì nhiều hàng */
+  .thumbs {
+    flex-wrap: nowrap !important; overflow-x: auto; scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch; padding-bottom: 4px;
+  }
+  .thumbs .thumb { flex: 0 0 64px; scroll-snap-align: start; }
+  .thumbs .thumb img { width: 64px; height: 64px; object-fit: cover; }
+  .swatch { width: 30px !important; height: 30px !important; }
+  #qty { font-size: 16px; }
+  /* Nút "Add to cart" dính đáy màn hình khi đọc mô tả */
+  #add-to-cart {
+    position: sticky; bottom: 10px; z-index: 15;
+    padding-top: 14px !important; padding-bottom: 14px !important;
+    font-size: 1rem !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
+  }
+
+  /* --- Giỏ hàng / form: chữ 16px để iOS không zoom --- */
+  .qty-input, #contact-form input, #contact-form textarea { font-size: 16px !important; }
+
+  footer.site-footer { margin-top: 40px !important; padding: 28px 0 !important; }
+}

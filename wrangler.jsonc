@@ -1,0 +1,24 @@
+{
+  // Cloudflare Pages: website (public/) + backend (functions/) + database D1.
+  // Chạy thử trên máy:  npx wrangler pages dev   (xem README.md)
+  "name": "infinite-builds-site",
+  "compatibility_date": "2025-09-01",
+  "pages_build_output_dir": "./public",
+
+  // Database sản phẩm / danh mục / blog / ảnh upload (tên "DB" được code gọi là env.DB)
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "infinite-builds-db",
+      "database_id": "3ece3150-7525-40e3-b135-fac468597e0a"
+    }
+  ]
+
+  // Bảo vệ Admin: sau khi tạo ứng dụng Cloudflare Access, bỏ dấu // ở khối dưới và điền 2 giá trị.
+  // (Hai giá trị này không phải mật khẩu.) Chưa điền = mọi API admin đều từ chối, an toàn mặc định.
+  // KHÔNG ghi email của bạn vào file này nếu repo để Public. Email được giới hạn trong policy của Access.
+  // , "vars": {
+  //   "ACCESS_TEAM_DOMAIN": "tenban.cloudflareaccess.com",
+  //   "ACCESS_AUD": "chuoi-audience-tag-dai"
+  // }
+}

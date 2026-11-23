@@ -1,0 +1,170 @@
+/* Thanh điều hướng (header) — tinh chỉnh cho máy tính + điện thoại.
+   Đi kèm header.js (thêm nút ☰, đánh dấu trang hiện tại, đưa ô tìm kiếm sang phải).
+   Nếu sau này build lại từ mã nguồn Astro, nhớ chép file này + header.js vào source. */
+
+/* ---------- Chung ---------- */
+header.site-header { box-shadow: 0 1px 0 rgba(0, 0, 0, .02), 0 4px 16px rgba(0, 0, 0, .03); }
+header.site-header .nav-row { align-items: center; }
+
+header.site-header .logo { color: var(--color-text); flex-shrink: 0; }
+
+header.site-header nav.main-nav { align-items: center; }
+
+/* Link chính + nút Collections: dạng "viên thuốc", vùng bấm lớn */
+header.site-header nav.main-nav > a,
+header.site-header .dd-toggle {
+  display: inline-flex; align-items: center; gap: 4px;
+  min-height: 40px; padding: 0 14px;
+  border-radius: 999px;
+  font-size: .98rem; font-weight: 500; line-height: 1;
+  color: var(--color-text);
+  white-space: nowrap;
+  transition: background-color .15s, color .15s;
+}
+header.site-header .dd-toggle .caret { font-size: .7rem; opacity: .7; transition: transform .15s; }
+header.site-header .dropdown:hover .caret,
+header.site-header .dropdown.open .caret { transform: rotate(180deg); }
+
+@media (hover: hover) {
+  header.site-header nav.main-nav > a:hover,
+  header.site-header .dd-toggle:hover { background: #f4efe7; color: var(--color-accent-dark); }
+}
+/* Trang đang xem */
+header.site-header nav.main-nav > a[aria-current="page"],
+header.site-header .dd-toggle.is-current {
+  background: #eaf2ed; color: var(--color-accent-dark); font-weight: 600;
+}
+header.site-header .dd-menu a[aria-current="page"] { background: #eaf2ed; color: var(--color-accent-dark); font-weight: 600; }
+
+header.site-header a:focus-visible,
+header.site-header button:focus-visible {
+  outline: 2px solid var(--color-accent); outline-offset: 2px;
+}
+
+/* Menu xổ xuống Collections */
+header.site-header .dd-menu { top: calc(100% + 8px); left: 0; padding: 6px; }
+header.site-header .dd-menu a { padding: 10px 12px; font-size: .95rem; color: var(--color-text); }
+
+/* Nút giỏ hàng */
+header.site-header .cart-link {
+  flex-shrink: 0;
+  height: 40px; padding: 0 8px 0 14px; gap: 8px;
+  border: 1px solid var(--color-border); border-radius: 999px;
+  background: #fff; color: var(--color-text);
+  transition: border-color .15s, background-color .15s;
+}
+header.site-header .cart-link svg { width: 18px; height: 18px; flex: none; }
+header.site-header .cart-link #cart-count { min-width: 22px; height: 22px; font-size: .75rem; font-weight: 700; }
+@media (hover: hover) {
+  header.site-header .cart-link:hover { border-color: var(--color-accent); background: #f7faf8; }
+}
+
+/* Nút ☰ (chỉ hiện ở màn hình nhỏ) */
+header.site-header .nav-burger {
+  display: none;
+  align-items: center; justify-content: center;
+  width: 42px; height: 42px; margin-left: -6px; padding: 0;
+  border: 0; border-radius: 12px; background: transparent;
+  color: var(--color-text); cursor: pointer; flex-shrink: 0;
+}
+header.site-header .nav-burger svg { width: 24px; height: 24px; }
+header.site-header .nav-burger .i-close { display: none; }
+header.site-header.nav-open .nav-burger .i-open { display: none; }
+header.site-header.nav-open .nav-burger .i-close { display: block; }
+@media (hover: hover) { header.site-header .nav-burger:hover { background: #f4efe7; } }
+
+/* ---------- Máy tính (> 960px): 1 hàng — logo | menu ở giữa | tìm kiếm + giỏ ---------- */
+@media (min-width: 961px) {
+  header.site-header .nav-row { flex-wrap: nowrap; gap: 16px; padding-top: 12px; padding-bottom: 12px; }
+  header.site-header nav.main-nav { flex: 1 1 auto; justify-content: center; flex-wrap: nowrap; gap: 2px; min-width: 0; }
+  header.site-header .nav-search { margin-left: auto; }
+}
+@media (min-width: 961px) and (max-width: 1100px) {
+  header.site-header nav.main-nav > a,
+  header.site-header .dd-toggle { padding: 0 10px; }
+  header.site-header .logo { font-size: 1.1rem; }
+}
+
+/* Ô tìm kiếm dạng đầy đủ (máy tính lớn) */
+@media (min-width: 1001px) {
+  header.site-header .nav-search input {
+    width: 230px; height: 40px;
+    padding-left: 36px;
+    background-color: #f6f3ee; background-position: 12px center;
+    border-color: transparent;
+    font-size: .95rem;
+  }
+  header.site-header .nav-search input:focus { background-color: #fff; border-color: var(--color-accent); }
+  /* Kết quả tìm kiếm canh phải theo ô tìm kiếm để không tràn mép màn hình */
+  header.site-header .nav-search .nav-search-results { left: auto; right: 0; }
+}
+@media (min-width: 1001px) and (max-width: 1100px) {
+  header.site-header .nav-search input { width: 190px; }
+}
+/* Ô tìm kiếm dạng icon (máy tính bảng): to bằng nút giỏ hàng */
+@media (min-width: 641px) and (max-width: 1000px) {
+  header.site-header .nav-search { width: 40px; height: 40px; }
+  header.site-header .nav-search input { height: 40px; width: 40px; padding-left: 36px; background-position: 12px center; }
+  header.site-header .nav-search input:focus,
+  header.site-header .nav-search input:not(:placeholder-shown) { width: 240px; }
+  header.site-header .nav-search .nav-search-results { top: 48px; }
+}
+
+/* ---------- Máy tính bảng + điện thoại (≤ 960px): nút ☰ ---------- */
+@media (max-width: 960px) {
+  header.site-header .nav-row { flex-wrap: wrap; gap: 8px; padding-top: 8px; padding-bottom: 8px; }
+  header.site-header .nav-burger { display: inline-flex; order: 0; }
+  header.site-header .logo { order: 1; flex: 1 1 auto; min-width: 0; font-size: 1.05rem; }
+  header.site-header .logo span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  header.site-header .logo img { width: 34px; height: 34px; }
+  header.site-header .nav-search { order: 2; }
+  header.site-header .cart-link { order: 3; }
+
+  /* Khi JS chạy: menu ẩn sau nút ☰. Không có JS thì menu vẫn hiện bình thường. */
+  header.site-header nav.main-nav { order: 10; width: 100%; }
+  header.site-header.js-nav nav.main-nav { display: none; }
+  header.site-header.js-nav.nav-open nav.main-nav {
+    display: flex; flex-direction: column; align-items: stretch; gap: 2px;
+    padding: 6px 0 12px; margin-top: 2px;
+    border-top: 1px solid var(--color-border);
+    max-height: calc(100vh - 120px); overflow-y: auto;
+  }
+  header.site-header.js-nav nav.main-nav > a,
+  header.site-header.js-nav .dd-toggle {
+    width: 100%; min-height: 48px; padding: 0 12px;
+    border-radius: 12px; font-size: 1.05rem; justify-content: flex-start;
+  }
+  /* Collections: hiện sẵn danh sách con, không cần xổ */
+  header.site-header.js-nav .dropdown { width: 100%; }
+  header.site-header.js-nav .dd-toggle { cursor: default; }
+  header.site-header.js-nav .dd-toggle .caret { display: none; }
+  header.site-header.js-nav .dd-menu {
+    display: block !important; position: static;
+    min-width: 0; margin: 0 0 4px 12px; padding: 0 0 0 10px;
+    border: 0; border-left: 2px solid var(--color-border); border-radius: 0;
+    box-shadow: none; background: transparent;
+  }
+  header.site-header.js-nav .dd-menu:before { display: none; }
+  header.site-header.js-nav .dd-menu a { min-height: 44px; display: flex; align-items: center; padding: 0 12px; color: var(--color-muted); font-size: 1rem; }
+  header.site-header.js-nav .dd-menu a[aria-current="page"] { color: var(--color-accent-dark); }
+  header.site-header.js-nav .dd-menu .dd-all { display: none; } /* trùng với "Products" */
+}
+
+/* ---------- Điện thoại (≤ 640px): hàng 1 = ☰ logo giỏ, hàng 2 = ô tìm kiếm ---------- */
+@media (max-width: 640px) {
+  header.site-header .nav-row { padding-left: 14px; padding-right: 14px; }
+  header.site-header .nav-search { order: 5; width: 100%; }
+  header.site-header .nav-search input {
+    height: 42px; padding-left: 38px;
+    background-color: #f6f3ee; background-position: 13px center; border-color: transparent;
+    font-size: 16px; /* 16px: iOS không tự phóng to khi gõ */
+  }
+  header.site-header .nav-search input:focus { background-color: #fff; border-color: var(--color-accent); }
+  header.site-header .cart-link { height: 40px; padding: 0 6px 0 12px; }
+  header.site-header .nav-search .nav-search-results { max-width: none; max-height: 60vh; }
+}
+@media (max-width: 400px) {
+  header.site-header .cart-link .cart-label { display: none; }
+  header.site-header .cart-link { padding: 0 6px 0 10px; gap: 6px; }
+  header.site-header .logo { font-size: .98rem; gap: 8px; }
+}

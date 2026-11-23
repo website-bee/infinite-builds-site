@@ -1,0 +1,31 @@
+# Redirect 301 từ URL cũ (Shopify) sang URL mới (giữ SEO)
+# File này dùng cho Cloudflare Pages — xem thêm ở Giai đoạn 6.
+# Đây mới chỉ là phần redirect blog (3 bài có handle tạm "test-1/2/3").
+# Sau khi có đủ danh sách URL sản phẩm/collection cũ (từ url_inventory.md), cần bổ sung thêm redirect cho từng URL nếu slug sản phẩm thay đổi.
+
+/blogs/highlight-blog/test-1  /blog/cute-desk-setup-ideas-with-miniature-decor  301
+/blogs/highlight-blog/test-2  /blog/from-idea-to-product-our-miniature-workflow  301
+/blogs/highlight-blog/test-3  /blog/understanding-miniature-scale-1-12-vs-1-24-vs-1-64  301
+
+# Các bài blog còn lại giữ nguyên slug, chỉ đổi tiền tố /blogs/highlight-blog/ -> /blog/
+/blogs/highlight-blog/diy-miniature-living-room-kit-build-a-cozy-scandinavian-inspired-dollhouse-space  /blog/diy-miniature-living-room-kit-build-a-cozy-scandinavian-inspired-dollhouse-space  301
+/blogs/highlight-blog/3-floor-corner-shopping-mall-for-smiski-build-a-tiny-world-for-your-collection  /blog/3-floor-corner-shopping-mall-for-smiski-build-a-tiny-world-for-your-collection  301
+/blogs/highlight-blog/smiski-castle-shelf-with-pencil-holder-where-desk-organization-meets-playful-display  /blog/smiski-castle-shelf-with-pencil-holder-where-desk-organization-meets-playful-display  301
+/blogs/highlight-blog/why-tealight-candles-are-perfect-for-cozy-home-decor  /blog/why-tealight-candles-are-perfect-for-cozy-home-decor  301
+/blogs/highlight-blog/how-laser-cut-miniatures-bring-tiny-worlds-to-life  /blog/how-laser-cut-miniatures-bring-tiny-worlds-to-life  301
+/blogs/highlight-blog/infinite-coffee-a-miniature-cafe-designed-for-dreamers  /blog/infinite-coffee-a-miniature-cafe-designed-for-dreamers  301
+/blogs/highlight-blog/best-dollhouse-accessories-you-can-3d-print-in-2026  /blog/best-dollhouse-accessories-you-can-3d-print-in-2026  301
+/blogs/highlight-blog/why-is-everyone-obsessed-with-smiski-and-why-every-smiski-deserves-a-tiny-home  /blog/why-is-everyone-obsessed-with-smiski-and-why-every-smiski-deserves-a-tiny-home  301
+/blogs/highlight-blog/3-trending-display-ideas-for-smiski-sonny-angel-in-2026  /blog/3-trending-display-ideas-for-smiski-sonny-angel-in-2026  301
+/blogs/highlight-blog/best-mini-planters-for-desk-aesthetic  /blog/best-mini-planters-for-desk-aesthetic  301
+/blogs/highlight-blog/the-complete-guide-to-3d-printing-miniatures  /blog/the-complete-guide-to-3d-printing-miniatures  301
+
+# Trang tĩnh
+/pages/about-us  /about  301
+/pages/contact  /contact  301
+
+# Chính sách
+# Lưu ý: KHÔNG thêm redirect trỏ về chính nó (vd /collections/x -> /collections/x) — sẽ gây lỗi ERR_TOO_MANY_REDIRECTS.
+# Collection và privacy/terms giữ nguyên URL như Shopify nên không cần redirect.
+/policies/refund-policy  /policies/shipping-and-refund-policy  301
+/policies/shipping-policy  /policies/shipping-and-refund-policy  301

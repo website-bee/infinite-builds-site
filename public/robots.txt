@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://infinitebuildstudio.com/sitemap-index.xml

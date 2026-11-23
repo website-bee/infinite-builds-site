@@ -1,0 +1,122 @@
+/* Giao diện trang quản trị. Chỉnh màu ở khối :root ngay dưới đây. */
+:root {
+  --bg: #f6f4f0;
+  --card: #fff;
+  --text: #222;
+  --muted: #6b6b6b;
+  --line: #e4dfd6;
+  --accent: #c96f4a;
+  --accent-dark: #a85a39;
+  --ok: #2f7d4f;
+  --warn: #b26b00;
+  --danger: #c0392b;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #1b1a18; --card: #26241f; --text: #eee; --muted: #a39d92; --line: #3b3832; --accent: #e08a63; --accent-dark: #f0a07a; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+a { color: var(--accent-dark); }
+.muted { color: var(--muted); }
+.pad { padding: 24px; }
+.small { font-size: 13px; }
+.right { margin-left: auto; }
+
+.topbar { display: flex; align-items: center; gap: 24px; padding: 12px 24px; background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+.brand { font-weight: 700; color: var(--text); text-decoration: none; }
+.brand span { color: var(--accent); }
+.topbar nav { display: flex; gap: 18px; }
+.topbar nav a { color: var(--muted); text-decoration: none; padding: 4px 0; border-bottom: 2px solid transparent; }
+.topbar nav a.active { color: var(--text); border-color: var(--accent); }
+#app { max-width: 1180px; margin: 0 auto; padding: 24px 16px 96px; }
+
+h1 { font-size: 24px; margin: 0; }
+h2 { font-size: 16px; margin: 0 0 12px; }
+.head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+
+/* nút */
+.btn { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+.btn.danger { color: var(--danger); }
+.btn.sm { padding: 4px 10px; font-size: 13px; }
+.btn:disabled { opacity: .55; cursor: wait; }
+
+/* ô nhập */
+input[type=text], input[type=number], input[type=url], select, textarea { font: inherit; width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--text); }
+input:focus, select:focus, textarea:focus, [contenteditable]:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+textarea { min-height: 160px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+label.field { display: block; margin-bottom: 14px; }
+label.field > span { display: block; font-weight: 600; margin-bottom: 4px; }
+label.field > small { display: block; color: var(--muted); margin-top: 3px; }
+.row { display: flex; gap: 12px; }
+.row > * { flex: 1; min-width: 0; }
+
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; }
+
+/* danh sách */
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.toolbar input { max-width: 280px; }
+.toolbar select { max-width: 220px; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.tab { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); cursor: pointer; font: inherit; color: var(--muted); }
+.tab.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--bg); }
+tr:last-child td { border-bottom: 0; }
+td.thumb img, .thumb-box { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; background: var(--bg); display: block; }
+td .title { font-weight: 600; }
+td.nowrap { white-space: nowrap; }
+td .actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+s.was { color: var(--muted); margin-left: 6px; font-size: 13px; }
+.badge { white-space: nowrap; display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.badge.pub { background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok); }
+.badge.draft { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+.empty { text-align: center; padding: 40px; color: var(--muted); }
+
+/* trang sửa sản phẩm */
+.editor { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .editor { grid-template-columns: 1fr; } .tablewrap { overflow-x: auto; } }
+.side { position: sticky; top: 70px; }
+
+.photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.photo { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; border: 2px solid var(--line); background: var(--bg); cursor: grab; }
+.photo.main { border-color: var(--accent); }
+.photo.over { outline: 2px dashed var(--accent); }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.photo .tag { position: absolute; left: 4px; bottom: 4px; background: var(--accent); color: #fff; font-size: 11px; padding: 1px 6px; border-radius: 4px; }
+.photo button { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; border: 0; background: rgba(0,0,0,.65); color: #fff; cursor: pointer; line-height: 1; }
+.drop { border: 2px dashed var(--line); border-radius: 8px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px; color: var(--muted); cursor: pointer; aspect-ratio: 1; font-size: 13px; }
+.drop:hover, .drop.over { border-color: var(--accent); color: var(--accent-dark); }
+.photo.loading { display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; cursor: default; }
+
+/* soạn mô tả */
+.rte-bar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; align-items: center; }
+.rte-bar button { font: inherit; border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+.rte-bar label { margin-left: auto; font-size: 13px; color: var(--muted); cursor: pointer; }
+.rte { min-height: 200px; max-height: 480px; overflow: auto; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); }
+.rte p { margin: 0 0 10px; }
+
+/* tùy chọn / màu */
+.group { border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.group .top { display: flex; gap: 8px; margin-bottom: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 4px 3px 10px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); font-size: 13px; }
+.chip button { border: 0; background: transparent; cursor: pointer; color: var(--muted); font-size: 15px; line-height: 1; padding: 0 4px; }
+.sw { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,.25); display: inline-block; }
+.presets { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.presets button { border: 1px dashed var(--line); background: transparent; color: var(--muted); border-radius: 999px; padding: 2px 9px; font-size: 12px; cursor: pointer; }
+.presets button:hover { border-color: var(--accent); color: var(--accent-dark); }
+.vtable input, .vtable select { padding: 5px 7px; font-size: 13px; }
+.vtable td, .vtable th { padding: 6px 8px; }
+.vtable td:first-child { white-space: nowrap; font-weight: 600; font-size: 13px; }
+
+.savebar { position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line); padding: 10px 24px; display: flex; gap: 10px; align-items: center; z-index: 30; }
+.savebar .msg { color: var(--muted); font-size: 13px; }
+
+#toasts { position: fixed; top: 64px; right: 16px; display: flex; flex-direction: column; gap: 8px; z-index: 50; }
+.toast { background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.25); max-width: 360px; }
+.toast.err { background: var(--danger); color: #fff; }
