@@ -33,7 +33,7 @@ Cần Node.js. Mọi lệnh chạy ở thư mục gốc của project.
    Chạy lại seed bất cứ lúc nào cũng an toàn: không ghi đè những gì bạn đã sửa trong Admin.
 3. **Cloudflare Pages → project → Settings → Builds:** Build command để trống, **Build output directory = `public`**.
 4. **Đặt mật khẩu Admin (Cloudflare Pages → project → Settings → Variables and secrets → Add):**
-   loại **Secret**, tên `ADMIN_PASSWORD`, giá trị là mật khẩu dài (tối thiểu 10 ký tự, nên là một câu dài dễ nhớ).
+   loại **Secret**, tên `ADMIN_PASSWORD`, giá trị là mật khẩu dài (tối thiểu 12 ký tự và không lặp một ký tự; nên là một câu dài dễ nhớ).
    Sau đó bấm Retry/Redeploy (hoặc push code) để mật khẩu có hiệu lực. Đổi mật khẩu = mọi phiên đăng nhập cũ bị đăng xuất.
    Đăng nhập tại `/admin/login`. Sai quá 8 lần/15 phút từ một IP thì IP đó bị khóa tạm.
    *(Có Cloudflare Access thì dùng được thay thế: điền `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD` vào `vars` trong `wrangler.jsonc`.)*

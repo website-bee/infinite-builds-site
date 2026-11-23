@@ -713,7 +713,7 @@ export function adminRow(p) {
 // Có 2 cách đăng nhập, cách nào được cấu hình thì cách đó hoạt động (có thể bật cả hai):
 //
 //  A) MẬT KHẨU (không cần Cloudflare Zero Trust, không cần thẻ)
-//     Cloudflare Pages > Settings > Variables and secrets > Add:  ADMIN_PASSWORD  (loại Secret, tối thiểu 10 ký tự)
+//     Cloudflare Pages > Settings > Variables and secrets > Add:  ADMIN_PASSWORD  (loại Secret, tối thiểu 12 ký tự, ít nhất 6 ký tự khác nhau)
 //     Đăng nhập ở /admin/login -> server cấp cookie phiên ký bằng HMAC, hiệu lực 7 ngày.
 //     Đổi ADMIN_PASSWORD = mọi phiên cũ bị vô hiệu.
 //
@@ -729,7 +729,12 @@ const toHex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padSta
 export const SESSION_COOKIE = 'admin_session';
 const SESSION_DAYS = 7;
 
-export const adminPasswordReady = (env) => typeof env.ADMIN_PASSWORD === 'string' && env.ADMIN_PASSWORD.length >= 10;
+/** Mật khẩu chỉ được chấp nhận khi đủ mạnh tối thiểu: >= 12 ký tự và có ít nhất 6 ký tự khác nhau
+ *  (chặn kiểu "7777777777", "aaaaaaaaaaaa", "1234512345"). Không đạt = coi như chưa cài, không ai đăng nhập được. */
+export const adminPasswordReady = (env) => {
+  const p = env.ADMIN_PASSWORD;
+  return typeof p === 'string' && p.length >= 12 && new Set(p).size >= 6;
+};
 
 async function sessionKey(env) {
   const base = await crypto.subtle.digest('SHA-256', enc.encode('ib-admin-session|' + env.ADMIN_PASSWORD));

@@ -28,7 +28,7 @@
     const f = document.getElementById('f'), err = document.getElementById('err'), go = document.getElementById('go');
     fetch('/api/auth').then(r => r.json()).then(s => {
       if (s.loggedIn) location.replace('/admin/');
-      else if (!s.configured) err.textContent = 'Chưa cài mật khẩu admin trên Cloudflare (biến ADMIN_PASSWORD). Xem README.md.';
+      else if (!s.configured) err.textContent = 'Chưa có mật khẩu admin hợp lệ trên Cloudflare (biến ADMIN_PASSWORD: tối thiểu 12 ký tự, không lặp một ký tự). Xem README.md.';
     }).catch(() => {});
     f.addEventListener('submit', async (e) => {
       e.preventDefault();

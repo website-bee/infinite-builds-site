@@ -255,7 +255,12 @@ console.log('Đăng nhập bằng mật khẩu');
     assert.equal((await gate(good, { ...e2, ADMIN_PASSWORD: 'mat-khau-moi-hoan-toan' })).status, 401, 'đổi mật khẩu = mọi phiên cũ mất hiệu lực');
     assert.equal((await gate('admin_session=garbage')).status, 401);
   });
-  await test('mật khẩu quá ngắn (<10) hoặc chưa đặt -> không bao giờ đăng nhập được', async () => {
+  await test('mật khẩu yếu (ngắn, lặp một ký tự như 7777777777) -> bị từ chối dù nhập đúng', async () => {
+    for (const weak of ['7777777777', 'aaaaaaaaaaaaaaaa', '1212121212121212', 'short']) {
+      assert.equal((await login(weak, { ...e2, ADMIN_PASSWORD: weak })).status, 503, weak);
+    }
+  });
+  await test('mật khẩu quá ngắn (<12) hoặc chưa đặt -> không bao giờ đăng nhập được', async () => {
     assert.equal((await login('short', { ...e2, ADMIN_PASSWORD: 'short' })).status, 503);
     assert.equal((await login('', { ...e2, ADMIN_PASSWORD: undefined })).status, 503);
     assert.equal((await gate('admin_session=v1.9999999999999.' + 'a'.repeat(64), { ...e2, ADMIN_PASSWORD: undefined })).status, 401);

@@ -15,7 +15,7 @@
   ]
 
   // Bảo vệ Admin: đặt mật khẩu trên Cloudflare (KHÔNG ghi vào file này vì repo có thể Public):
-  //   Pages > Settings > Variables and secrets > Add > loại Secret, tên ADMIN_PASSWORD, tối thiểu 10 ký tự.
+  //   Pages > Settings > Variables and secrets > Add > loại Secret, tên ADMIN_PASSWORD, tối thiểu 12 ký tự, không lặp một ký tự.
   // Chưa đặt = trang Admin và mọi API admin đều từ chối.
   // (Nếu sau này dùng Cloudflare Access: thêm "vars": { "ACCESS_TEAM_DOMAIN": "...", "ACCESS_AUD": "..." })
 }

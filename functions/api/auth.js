@@ -28,7 +28,7 @@ export async function onRequestPost({ env, request }) {
   const origin = request.headers.get('Origin');
   if (origin && origin !== new URL(request.url).origin) return jsonResponse({ error: 'Origin không hợp lệ' }, 403);
   if (!adminPasswordReady(env)) {
-    return jsonResponse({ error: 'Chưa cài mật khẩu admin (ADMIN_PASSWORD, tối thiểu 10 ký tự) trên Cloudflare.' }, 503);
+    return jsonResponse({ error: 'Chưa cài mật khẩu admin hợp lệ (ADMIN_PASSWORD: tối thiểu 12 ký tự, không lặp một ký tự) trên Cloudflare.' }, 503);
   }
 
   const who = ip(request);
